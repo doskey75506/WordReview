@@ -1,26 +1,28 @@
-# 听写与翻译练习
+# Dictation and Translation Practice
 
-运行图形界面：
+Run the graphical interface:
 
-```bash
+```*bash*
 /usr/bin/python3 ctest.py
 ```
 
-也可以使用任何已安装 Tk 图形库的 Python 解释器运行。若 `python3 ctest.py` 提示找不到 `_tkinter`，请改用上面的 macOS 系统 Python，或在当前 Python 环境中安装 Tk。
+You can also run it with any Python interpreter that has the Tk GUI library installed. If `python3 ctest.py` reports that `_tkinter` cannot be found, use the macOS system Python shown above, or install Tk in the current Python environment.
 
-启动文件选择窗口时，会默认打开项目内的 `Resource` 目录。在首页选择一个 UTF-8 编码的 CSV 文件，再选择“听写”或“翻译练习”。CSV 每一行必须有两列，且不应有标题行：
+When the file selection window opens, it will default to the `Resource` directory in the project. On the home page, select a UTF-8 encoded CSV file, then choose either “Dictation” or “Translation Practice”. Each row of the CSV file must contain two columns and should not have a header row:
 
-```csv
-bonjour,你好
-我喜欢学习法语,J'aime apprendre le français
+```*csv*
+is,est
+French,français
+I,je
+he,il
 ```
 
-- **听写**：播放主列内容，输入听到的文字。
-- **翻译练习**：显示主列内容，输入另一列的文字。
-- 首页的 **Random question order** 默认勾选；取消勾选后按 CSV 原始行顺序练习。
-- 首页的 **Use column 2 as the primary column** 可将两列角色互换。听写始终朗读当前主列；翻译练习显示当前主列并考核另一列。
-- 可在 **Exam range** 中输入起止行号（例如 `1` 到 `10`），只考核该包含首尾的范围。
-- 答案比较会忽略首尾/连续空格和英文字母大小写；`|` 或 `｜` 表示“或”，任一选项都算正确。法语重音、中文等文字差异仍会保留。
-- 每次练习中答错的题目会追加保存到项目文件夹的 `Wrong.csv`，其中包含题目、标准译文和输入的答案。
+- **Dictation**: Play the content of the primary column and enter the text you hear.
+- **Translation Practice**: Display the content of the primary column and enter the text from the other column.
+- The **Random question order** option on the home page is selected by default. Uncheck it to practice in the original row order of the CSV file.
+- The **Use column 2 as the primary column** option on the home page swaps the roles of the two columns. Dictation always reads the current primary column aloud; Translation Practice displays the current primary column and tests the other column.
+- You can enter the starting and ending row numbers in **Exam range** (for example, `1` to `10`) to practice only the specified inclusive range.
+- Answer comparison ignores leading/trailing and consecutive spaces, as well as English letter case; `|` or `｜` means “or”, and either option is accepted as correct. Differences in French accents, Chinese characters, and other text are still preserved.
+- Incorrect answers from each practice session are appended to `Wrong.csv` in the project directory. It contains the question, the correct translation, and the answer entered by the user.
 
-听写会使用系统已安装的语音；在 macOS 上使用 `say`。若某个语言没有可用系统语音，仍可正常完成翻译练习。
+Dictation uses the system-installed voices; on macOS, it uses `say`. If no system voice is available for a particular language, Translation Practice can still be used normally.
