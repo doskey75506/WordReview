@@ -4,7 +4,13 @@ import platform
 import subprocess
 
 
+def speech_text(text: str) -> str:
+    """Avoid spelling out capital letters when the content is a word."""
+    return text.casefold()
+
+
 def read_text_aloud(text: str) -> None:
+    text = speech_text(text)
     try:
         if platform.system() == "Darwin":
             subprocess.run(["say", text], check=False)
