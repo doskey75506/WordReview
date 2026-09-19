@@ -16,7 +16,7 @@ from random import shuffle
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from Reader import read_text_aloud
+from Reader import detect_language, read_text_aloud
 
 WRONG_FILE = Path(__file__).with_name("Wrong.csv")
 RESOURCE_DIR = Path(__file__).with_name("Resource")
@@ -160,13 +160,21 @@ class PracticeApp(tk.Tk):
         item = self.session_exercises[self.current]
         frame = ttk.Frame(self, padding=32)
         frame.pack(fill="both", expand=True)
-        label = "Dictation" if self.mode == "dictation" else "spelling Practice"
+        label = "Dictation" if self.mode == "dictation" else "Spelling Practice"
         ttk.Label(frame, text=label, font=("Arial Unicode MS", 20, "bold")).pack(anchor="w")
-        ttk.Label(frame, text=f"Question {self.current + 1} of {len(self.exercises)}").pack(anchor="w", pady=(4, 22))
+        ttk.Label(frame, text=f"Question {self.current + 1} of {len(self.session_exercises)}").pack(anchor="w", pady=(4, 22))
+        primary = self.primary_text(item)
+        secondary = self.secondary_text(item)
+        primary_language = detect_language(primary)
+        secondary_language = detect_language(secondary)
         if self.mode == "spelling":
-            prompt, display, instruction = "Primary text", self.primary_text(item), "Type the matching text from the other column:"
+            prompt = f"{primary_language} text"
+            display = primary
+            instruction = f"Based on the {primary_language} text, write the {secondary_language} text:"
         else:
-            prompt, display, instruction = "Dictation", "Listen to the audio, then type the primary text.", "Type what you hear:"
+            prompt = f"{primary_language} dictation"
+            display = f"Listen to the {primary_language} pronunciation, then type the {primary_language} text."
+            instruction = f"Based on the {primary_language} pronunciation, write the {primary_language} text:"
         ttk.Label(frame, text=prompt).pack(anchor="w")
         ttk.Label(frame, text=display, font=("Arial Unicode MS", 18), wraplength=550).pack(anchor="w", pady=(5, 20))
         if self.mode == "dictation":
