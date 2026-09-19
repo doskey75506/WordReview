@@ -25,4 +25,4 @@ he,il
 - Answer comparison ignores leading/trailing and consecutive spaces, as well as English letter case; `|` or `｜` means “or”, and either option is accepted as correct. Differences in French accents, Chinese characters, and other text are still preserved.
 - Incorrect answers from each practice session are appended to `Wrong.csv` in the project directory. It contains the question, the correct translation, and the answer entered by the user.
 
-Dictation uses the system-installed voices; on macOS, it uses `say`. If no system voice is available for a particular language, Translation Practice can still be used normally.
+Dictation uses the system-installed voices; on macOS, it uses `say` and automatically selects a Chinese, French, Spanish, or English voice based on the text. If no system voice is available for a particular language, Translation Practice can still be used normally.
