@@ -1,7 +1,6 @@
 """A small GUI app for dictation and spelling practice.
 
-CSV files must have two data columns: source text in column one and its
-spelling in column two.
+CSV files have a two-language header, followed by two data columns.
 """
 
 from __future__ import annotations
@@ -16,7 +15,7 @@ from random import shuffle
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from Reader import detect_language, read_text_aloud
+from Reader import canonical_language, read_text_aloud
 
 WRONG_FILE = Path(__file__).with_name("Wrong.csv")
 RESOURCE_DIR = Path(__file__).with_name("Resource")
@@ -47,11 +46,19 @@ def select_exercise_range(exercises: list[Exercise], start: int, end: int) -> li
     return exercises[start - 1 : end]
 
 
-def load_exercises(filename: str) -> list[Exercise]:
-    """Read a two-column UTF-8 CSV, accepting a UTF-8 BOM as well."""
+def load_exercises(filename: str) -> tuple[list[Exercise], tuple[str, str]]:
+    """Read a two-column CSV whose first row names the two languages."""
     exercises: list[Exercise] = []
     with open(filename, "r", encoding="utf-8-sig", newline="") as csv_file:
-        for row_number, row in enumerate(csv.reader(csv_file), start=1):
+        rows = csv.reader(csv_file)
+        try:
+            header = next(rows)
+        except StopIteration:
+            raise ValueError("The CSV file is empty.") from None
+        if len(header) < 2:
+            raise ValueError("The first row must name the languages of both columns.")
+        languages = (canonical_language(header[0]), canonical_language(header[1]))
+        for row_number, row in enumerate(rows, start=2):
             if not row or not any(cell.strip() for cell in row):
                 continue
             if len(row) < 2:
@@ -62,7 +69,7 @@ def load_exercises(filename: str) -> list[Exercise]:
             exercises.append(Exercise(source, spelling))
     if not exercises:
         raise ValueError("The CSV file contains no exercises.")
-    return exercises
+    return exercises, languages
 
 
 class PracticeApp(tk.Tk):
@@ -71,6 +78,7 @@ class PracticeApp(tk.Tk):
         self.title("Dictation and spelling Practice")
         self.minsize(620, 500)
         self.exercises: list[Exercise] = []
+        self.column_languages = ("English", "English")
         self.session_exercises: list[Exercise] = []
         self.current = 0
         self.mode = ""
@@ -125,10 +133,10 @@ class PracticeApp(tk.Tk):
         if not filename:
             return
         try:
-            self.exercises = load_exercises(filename)
+            self.exercises, self.column_languages = load_exercises(filename)
         except (OSError, UnicodeDecodeError, csv.Error, ValueError) as error:
             self.exercises = []
-            messagebox.showerror("Unable to Read File", f"Please choose a UTF-8 CSV file with two columns.\n\n{error}")
+            messagebox.showerror("Unable to Read File", f"The first row must name two supported languages, followed by two data columns.\n\n{error}")
             return
         self.status.set(f"Loaded {len(self.exercises)} exercise(s): {Path(filename).name}")
         self.range_start.set("1")
@@ -155,6 +163,12 @@ class PracticeApp(tk.Tk):
     def secondary_text(self, item: Exercise) -> str:
         return item.source if self.second_column_primary.get() else item.spelling
 
+    def primary_language(self) -> str:
+        return self.column_languages[1] if self.second_column_primary.get() else self.column_languages[0]
+
+    def secondary_language(self) -> str:
+        return self.column_languages[0] if self.second_column_primary.get() else self.column_languages[1]
+
     def _build_question(self) -> None:
         self._clear()
         item = self.session_exercises[self.current]
@@ -165,8 +179,8 @@ class PracticeApp(tk.Tk):
         ttk.Label(frame, text=f"Question {self.current + 1} of {len(self.session_exercises)}").pack(anchor="w", pady=(4, 22))
         primary = self.primary_text(item)
         secondary = self.secondary_text(item)
-        primary_language = detect_language(primary)
-        secondary_language = detect_language(secondary)
+        primary_language = self.primary_language()
+        secondary_language = self.secondary_language()
         if self.mode == "spelling":
             prompt = f"{primary_language} text"
             display = primary
@@ -191,7 +205,7 @@ class PracticeApp(tk.Tk):
 
     def speak(self, text: str) -> None:
         """Speech runs in a worker so it never freezes the answer form."""
-        threading.Thread(target=read_text_aloud, args=(text,), daemon=True).start()
+        threading.Thread(target=read_text_aloud, args=(text, self.primary_language()), daemon=True).start()
 
     def submit(self) -> None:
         item = self.session_exercises[self.current]

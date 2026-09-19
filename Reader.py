@@ -1,4 +1,4 @@
-"""Language-aware, best-effort text-to-speech used by the GUI."""
+"""Header-selected, best-effort text-to-speech used by the GUI."""
 
 from __future__ import annotations
 
@@ -20,23 +20,6 @@ LANGUAGE_CODES = {
     "Spanish": ("es",),
     "English": ("en",),
 }
-FRENCH_ACCENTS = "àâæçèêëîïôœùûÿ"
-SPANISH_ACCENTS = "ñáíóú¿¡"
-# These appear in both French and Spanish. They are used as a weaker signal,
-# while language-specific words and accents decide ambiguous cases.
-SHARED_ACCENTS = "éü"
-FRENCH_WORDS = {
-    "bonjour", "merci", "être", "est", "français", "anglais", "petit", "grand",
-    "je", "il", "elle", "aimer", "aime", "le", "la", "les", "un", "une",
-    "êtes", "prêt", "été", "café", "bébé", "aiguë", "crème", "déjà", "très",
-    "de", "des", "et", "dans", "pour", "avec", "vous", "nous", "pas", "que",
-}
-SPANISH_WORDS = {
-    "hola", "gracias", "adiós", "ser", "estar", "es", "pequeño", "grande",
-    "yo", "él", "ella", "me", "gusta", "el", "la", "los", "las", "un", "una",
-    "qué", "café", "pingüino", "también", "estás", "esté", "más", "sí", "después",
-    "de", "y", "en", "para", "con", "usted", "nosotros", "no", "que", "como",
-}
 
 
 def speech_text(text: str) -> str:
@@ -44,22 +27,13 @@ def speech_text(text: str) -> str:
     return text.casefold()
 
 
-def detect_language(text: str) -> str:
-    """Recognise the four languages supported by this app, with English fallback."""
-    lowered = speech_text(text)
-    if any("\u4e00" <= character <= "\u9fff" for character in lowered):
-        return "Chinese"
-    words = set(re.findall(r"[a-zà-ÿœ]+", lowered))
-    french_score = 3 * len(words & FRENCH_WORDS) + sum(character in FRENCH_ACCENTS for character in lowered)
-    spanish_score = 3 * len(words & SPANISH_WORDS) + sum(character in SPANISH_ACCENTS for character in lowered)
-    # A standalone é/ü is more common in French vocabulary. Spanish lexical
-    # evidence still wins, for example "qué" and "pingüino".
-    french_score += sum(character in SHARED_ACCENTS for character in lowered)
-    if french_score > spanish_score:
-        return "French"
-    if spanish_score > french_score:
-        return "Spanish"
-    return "English"
+def canonical_language(value: str) -> str:
+    """Validate and standardise a language name from a CSV header cell."""
+    for language in LANGUAGE_LOCALES:
+        if value.strip().casefold() == language.casefold():
+            return language
+    supported = ", ".join(LANGUAGE_LOCALES)
+    raise ValueError(f"Unsupported language '{value}'. Use one of: {supported}.")
 
 
 @lru_cache(maxsize=1)
@@ -79,6 +53,10 @@ def available_macos_voices() -> dict[str, str]:
 
 
 def voice_for(language: str) -> str | None:
+    # Match SpellingTest's English behaviour: `say text` with no forced voice.
+    # The user can therefore choose their preferred English voice in macOS.
+    if language == "English":
+        return None
     for locale in LANGUAGE_LOCALES[language]:
         voice = available_macos_voices().get(locale)
         if voice:
@@ -105,9 +83,10 @@ def pyttsx3_voice_for(engine: object, language: str) -> str | None:
     return None
 
 
-def read_text_aloud(text: str) -> None:
+def read_text_aloud(text: str, language: str) -> None:
+    """Read text using the language explicitly supplied by the CSV header."""
     text = speech_text(text)
-    language = detect_language(text)
+    language = canonical_language(language)
     try:
         if platform.system() == "Darwin":
             command = ["say"]
