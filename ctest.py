@@ -109,7 +109,7 @@ class PracticeApp(tk.Tk):
         options.pack(pady=(0, 10))
         ttk.Checkbutton(options, text="Random question order", variable=self.random_order).grid(row=0, column=0, sticky="w")
         ttk.Checkbutton(options, text="Reverse exercise", variable=self.second_column_primary).grid(row=1, column=0, sticky="w", pady=(5, 0))
-        ttk.Label(options, text="Type out the word according to the text or voice").grid(row=2, column=0, sticky="w", pady=(5, 0))
+        ttk.Label(options, text="Type the answer based on the displayed text or spoken prompt.").grid(row=2, column=0, sticky="w", pady=(5, 0))
         range_options = ttk.LabelFrame(frame, text="Exam range (loaded row numbers)", padding=(16, 8))
         range_options.pack(pady=(0, 10))
         ttk.Label(range_options, text="Start row:").grid(row=0, column=0, sticky="w")
