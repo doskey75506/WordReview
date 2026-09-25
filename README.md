@@ -26,4 +26,8 @@ he,il
 - Answer comparison ignores leading/trailing and consecutive spaces, as well as English letter case; `|` or `｜` means “or”, and either option is accepted as correct. Differences in French accents, Chinese characters, and other text are still preserved.
 - Incorrect answers from each practice session are appended to `Wrong.csv` in the project directory. It contains the question, the correct translation, and the answer entered by the user.
 
+<<<<<<< Updated upstream
 Dictation uses the language declared for the current secondary column in the CSV header to select a matching system voice. On macOS, English uses the default `say` voice (the same behaviour as the `SpellingTest` project), while Chinese, French, and Spanish select a matching voice. On Windows/Linux it uses a language-tagged `pyttsx3` voice when the installed engine exposes one. If no matching system voice is available, it falls back to the system default and Spelling Practice remains available.
+=======
+Dictation uses the language declared for the current secondary column in the CSV header to select a matching system voice. On macOS, English uses the default `say` voice (the same behaviour as the `SpellingTest` project); Chinese uses the original `Tingting` voice; French and Spanish use their matching voice from the modern `Eddy` voice family. Non-English voices use a slower rate of 150 words per minute. On Windows/Linux it uses a language-tagged `pyttsx3` voice when the installed engine exposes one. If no matching system voice is available, it falls back to the system default and Spelling Practice remains available.
+>>>>>>> Stashed changes

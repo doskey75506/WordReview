@@ -20,6 +20,9 @@ LANGUAGE_CODES = {
     "Spanish": ("es",),
     "English": ("en",),
 }
+NON_ENGLISH_RATE = "150"
+PREFERRED_MACOS_VOICE_FAMILY = "Eddy"
+PREFERRED_CHINESE_VOICE = "Tingting"
 
 
 def speech_text(text: str) -> str:
@@ -45,10 +48,15 @@ def available_macos_voices() -> dict[str, str]:
         return {}
     voices: dict[str, str] = {}
     for line in result.stdout.splitlines():
-        match = re.match(r"^(.*?)\s{2,}([a-z]{2}_[A-Z]{2})\s+#", line)
+        match = re.match(r"^(.*?)\s+([a-z]{2}_[A-Z]{2})\s+#", line)
         if match:
             voice_name, locale = match.groups()
-            voices.setdefault(locale, voice_name)
+            # Keep the original Chinese voice, while preferring the modern
+            # Eddy family for French and Spanish.
+            is_preferred_chinese_voice = locale == "zh_CN" and voice_name == PREFERRED_CHINESE_VOICE
+            is_preferred_eddy_voice = locale.startswith(("fr_", "es_")) and voice_name.startswith(PREFERRED_MACOS_VOICE_FAMILY)
+            if is_preferred_chinese_voice or is_preferred_eddy_voice or locale not in voices:
+                voices[locale] = voice_name
     return voices
 
 
@@ -93,6 +101,8 @@ def read_text_aloud(text: str, language: str) -> None:
             voice = voice_for(language)
             if voice:
                 command.extend(["-v", voice])
+            if language != "English":
+                command.extend(["-r", NON_ENGLISH_RATE])
             subprocess.run([*command, text], check=False)
             return
         # pyttsx3 uses voices installed on Windows/Linux. Select a matching
