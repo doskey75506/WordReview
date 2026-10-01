@@ -1,0 +1,2 @@
+# Used for text-to-speech on Windows and Linux.
+pyttsx3>=2.90

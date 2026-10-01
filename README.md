@@ -6,7 +6,25 @@ Run the graphical interface:
 /usr/bin/python3 ctest.py
 ```
 
-You can also run it with any Python interpreter that has the Tk GUI library installed. If `python3 ctest.py` reports that `_tkinter` cannot be found, use the macOS system Python shown above, or install Tk in the current Python environment.
+To set up a new virtual environment and install the Python dependency:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python ctest.py
+```
+
+To create a Conda environment with Tkinter included:
+
+```bash
+conda create -n wordreview python=3.11 tk
+conda activate wordreview
+pip install -r requirements.txt
+python ctest.py
+```
+
+`tk` is the Conda package that provides Tkinter. Tkinter is not available from pip, so it is intentionally not listed in `requirements.txt`. If `python3 ctest.py` reports that `_tkinter` cannot be found, use the Conda commands above or the macOS system Python shown earlier.
 
 When the file selection window opens, it will default to the `Resource` directory in the project. On the home page, select a UTF-8 encoded CSV file, then choose either “Dictation” or “Spelling Practice”. The first row is required: it names the language in each column. Supported names are `English`, `French`, `Spanish`, and `Chinese`. Every later row must contain the two matching data values:
 
