@@ -186,14 +186,14 @@ class PracticeApp(tk.Tk):
             display = primary
             instruction = f"Based on the {primary_language} text, write the {secondary_language} text:"
         else:
-            prompt = f"{primary_language} dictation"
-            display = f"Listen to the {primary_language} pronunciation, then type the {primary_language} text."
-            instruction = f"Based on the {primary_language} pronunciation, write the {primary_language} text:"
+            prompt = f"{secondary_language} dictation"
+            display = f"Listen to the {secondary_language} pronunciation, then type the {secondary_language} text."
+            instruction = f"Based on the {secondary_language} pronunciation, write the {secondary_language} text:"
         ttk.Label(frame, text=prompt).pack(anchor="w")
         ttk.Label(frame, text=display, font=("Arial Unicode MS", 18), wraplength=550).pack(anchor="w", pady=(5, 20))
         if self.mode == "dictation":
-            ttk.Button(frame, text="▶ Play Primary Text", command=lambda: self.speak(self.primary_text(item))).pack(anchor="w", pady=(0, 16))
-            self.after(250, lambda: self.speak(self.primary_text(item)))
+            ttk.Button(frame, text="▶ Play Text to Write", command=lambda: self.speak(secondary, secondary_language)).pack(anchor="w", pady=(0, 16))
+            self.after(250, lambda: self.speak(secondary, secondary_language))
         ttk.Label(frame, text=instruction).pack(anchor="w")
         entry = ttk.Entry(frame, textvariable=self.answer, font=("Arial Unicode MS", 16))
         entry.pack(fill="x", pady=(5, 16))
@@ -203,14 +203,14 @@ class PracticeApp(tk.Tk):
         ttk.Button(frame, text="Back to Home", command=self._build_home).pack(anchor="w", pady=(18, 0))
         self.answer.set("")
 
-    def speak(self, text: str) -> None:
+    def speak(self, text: str, language: str) -> None:
         """Speech runs in a worker so it never freezes the answer form."""
-        threading.Thread(target=read_text_aloud, args=(text, self.primary_language()), daemon=True).start()
+        threading.Thread(target=read_text_aloud, args=(text, language), daemon=True).start()
 
     def submit(self) -> None:
         item = self.session_exercises[self.current]
         given = self.answer.get()
-        expected = self.primary_text(item) if self.mode == "dictation" else self.secondary_text(item)
+        expected = self.secondary_text(item)
         # Either CSV column may contain alternatives, including in dictation.
         if not is_correct_answer(given, expected, allow_alternatives=True):
             self.wrong_answers.append((item, given.strip()))
@@ -239,7 +239,7 @@ class PracticeApp(tk.Tk):
             kind = "Dictation" if self.mode == "dictation" else "spelling"
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             for item, given in self.wrong_answers:
-                expected = self.primary_text(item) if self.mode == "dictation" else self.secondary_text(item)
+                expected = self.secondary_text(item)
                 writer.writerow([timestamp, kind, self.primary_text(item), expected, given])
 
 

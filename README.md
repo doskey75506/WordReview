@@ -18,12 +18,16 @@ I,je
 he,il
 ```
 
-- **Dictation**: Play the content of the primary column and enter the text you hear.
+- **Dictation**: Play the content of the secondary column and enter the text you hear.
 - **Spelling Practice**: Display the content of the primary column and enter the text from the other column.
 - The **Random question order** option on the home page is selected by default. Uncheck it to practice in the original row order of the CSV file.
-- The **Reverse exercise** option on the home page swaps the roles of the two columns. Dictation always reads the current primary column aloud; Spelling Practice displays the current primary column and tests the other column.
+- The **Reverse exercise** option on the home page swaps the roles of the two columns. Both Dictation and Spelling Practice test the current secondary column; Spelling Practice displays the primary column, while Dictation reads the secondary column aloud.
 - You can enter the starting and ending row numbers in **Exam range** (for example, `1` to `10`) to practice only the specified inclusive range.
 - Answer comparison ignores leading/trailing and consecutive spaces, as well as English letter case; `|` or `｜` means “or”, and either option is accepted as correct. Differences in French accents, Chinese characters, and other text are still preserved.
 - Incorrect answers from each practice session are appended to `Wrong.csv` in the project directory. It contains the question, the correct translation, and the answer entered by the user.
 
-Dictation uses the language declared for the current primary column in the CSV header to select a matching system voice. On macOS, English uses the default `say` voice (the same behaviour as the `SpellingTest` project), while Chinese, French, and Spanish select a matching voice. On Windows/Linux it uses a language-tagged `pyttsx3` voice when the installed engine exposes one. If no matching system voice is available, it falls back to the system default and Spelling Practice remains available.
+<<<<<<< Updated upstream
+Dictation uses the language declared for the current secondary column in the CSV header to select a matching system voice. On macOS, English uses the default `say` voice (the same behaviour as the `SpellingTest` project), while Chinese, French, and Spanish select a matching voice. On Windows/Linux it uses a language-tagged `pyttsx3` voice when the installed engine exposes one. If no matching system voice is available, it falls back to the system default and Spelling Practice remains available.
+=======
+Dictation uses the language declared for the current secondary column in the CSV header to select a matching system voice. On macOS, English uses the default `say` voice (the same behaviour as the `SpellingTest` project); Chinese uses the original `Tingting` voice; French and Spanish use their matching voice from the modern `Eddy` voice family. Non-English voices use a slower rate of 150 words per minute. On Windows/Linux it uses a language-tagged `pyttsx3` voice when the installed engine exposes one. If no matching system voice is available, it falls back to the system default and Spelling Practice remains available.
+>>>>>>> Stashed changes
