@@ -1,0 +1,11 @@
+.idea
+.DS_store
+.git
+# Learner data: every CSV is ignored (Wrong.csv and any wrong-review CSVs);
+# only the bundled sample stays tracked.
+*.csv
+!Resource/example.csv
+Wrong*.csv
+Resource/Data/
+__pycache__/
+AGENTS.md
