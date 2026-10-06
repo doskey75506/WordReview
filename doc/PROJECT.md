@@ -52,12 +52,15 @@ Dictation and spelling practice desktop tool: Python + Tkinter, flat modules in 
 
 ## Verification
 
-There is **no** test suite, linter, formatter, typechecker or CI in this repo. Available checks:
+No linter, formatter, typechecker or CI. Checks, run from the repo root:
 
 1. `python -m py_compile *.py`
-2. Launch the GUI manually and exercise Dictation / Spelling / review with `Resource/example.csv`.
+2. `python -m unittest` — stdlib only:
+   - `test_modules.py` — a fresh-interpreter import for every module (protects the module boundaries against import-order breaks and missing symbols), expected public symbols, `PracticeApp` mixin composition, the shared `DictationMode`/`SpellingMode` interface.
+   - `test_wrong_entries.py` — the fragile CSV-cleanup behaviour of `load_wrong_entries`/`write_wrong_entries`: malformed-row purging, legacy-row purging, header restore, rebuild from zero after delete/empty, parent-directory creation, UTF-8 BOM, round-trip equality, and leaving a clean file untouched.
+3. Launch the GUI manually and exercise Dictation / Spelling / review with `Resource/example.csv`.
 
-Scripted tests can drive `PracticeApp` without a mainloop — but you **must** patch `tkinter.messagebox.showinfo/showerror` first or dialogs will block. For the data layer, `import files` and point `files.WRONG_FILE` at a temp path.
+GUI-level tests can drive `PracticeApp` without a mainloop — but you **must** patch `tkinter.messagebox.showinfo/showerror` first or dialogs will block. For the data layer, `import files` and point `files.WRONG_FILE` at a temp path (the unit tests do exactly this).
 
 ## Known issues
 

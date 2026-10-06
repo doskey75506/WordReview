@@ -52,12 +52,15 @@
 
 ## 验证
 
-仓库**没有**测试套件、linter、formatter、typechecker 或 CI。可用的检查：
+仓库**没有** linter、formatter、typechecker 或 CI。可用的检查（在仓库根目录运行）：
 
 1. `python -m py_compile *.py`
-2. 手工启动 GUI，用 `Resource/example.csv` 走一遍 Dictation / Spelling / 复习。
+2. `python -m unittest` —— 纯标准库，无需安装：
+   - `test_modules.py` —— 每个模块各开一个全新解释器 import（防止拆分后出现 import 顺序问题或符号缺失），并检查公开符号、`PracticeApp` 的 mixin 组合、听写/拼写模式的统一接口。
+   - `test_wrong_entries.py` —— 最脆弱的 CSV 清理行为：坏行清除、旧格式行清除、补表头、删除/清空后从 0 重建、自动创建父目录、UTF-8 BOM、整表往返一致、干净文件不被重写。
+3. 手工启动 GUI，用 `Resource/example.csv` 走一遍 Dictation / Spelling / 复习。
 
-脚本化驱动 `PracticeApp` 不需要 mainloop，但**必须先**打补丁 `tkinter.messagebox.showinfo/showerror`，否则弹窗会阻塞。可直接 `import files` 后改 `files.WRONG_FILE` 指向临时路径来测数据层。
+脚本化驱动 `PracticeApp` 不需要 mainloop，但**必须先**打补丁 `tkinter.messagebox.showinfo/showerror`，否则弹窗会阻塞。测数据层时 `import files` 后把 `files.WRONG_FILE` 指向临时路径即可（单测就是这么做的）。
 
 ## 已知问题
 
