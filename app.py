@@ -77,9 +77,13 @@ class PracticeApp(PracticeMixin, ReviewMixin, tk.Tk):
         ttk.Label(range_options, textvariable=self.range_hint).grid(row=1, column=0, columnspan=4, sticky="w", pady=(6, 0))
         choices = ttk.Frame(frame)
         choices.pack(pady=10)
-        self.dictation_button = ttk.Button(choices, text="Dictation", command=lambda: self.start("dictation"), state="disabled")
+        # Keep a loaded CSV across home rebuilds so options (range, reverse,
+        # random) can be changed and another practice started without
+        # re-choosing the file.
+        start_state = "normal" if self.exercises else "disabled"
+        self.dictation_button = ttk.Button(choices, text="Dictation", command=lambda: self.start("dictation"), state=start_state)
         self.dictation_button.grid(row=0, column=0, padx=8, ipady=8, ipadx=22)
-        self.spelling_button = ttk.Button(choices, text="Spelling", command=lambda: self.start("spelling"), state="disabled")
+        self.spelling_button = ttk.Button(choices, text="Spelling", command=lambda: self.start("spelling"), state=start_state)
         self.spelling_button.grid(row=0, column=1, padx=8, ipady=8, ipadx=22)
         ttk.Button(choices, text="Review Wrong Answers", command=self._open_review).grid(
             row=1, column=0, columnspan=2, pady=(12, 0), ipady=6, ipadx=12
